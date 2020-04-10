@@ -20,13 +20,13 @@
 
         //Update with historial info
         var client = new HttpClient();
-        client.get('http://localhost:3000/api/canvas/historial/5e8fcd88f9dcbe2b703e447b', function(response) {
+        client.get('http://localhost:3000/api/canvas/historial/5e902fd08c49cf44c26a089d', function(response) {
             response = JSON.parse(response)
             console.log(response);
             response.drawingHistorial.drawingHistorial.forEach(element => {
                 var show = JSON.stringify(element);
                 var inputCell = document.getElementById("input");
-                inputCell.innerHTML = show + '<br />' + inputCell.innerHTML;
+                inputCell.innerHTML = show + '<br/>' + inputCell.innerHTML;
             });
         });
 
@@ -37,7 +37,7 @@
             if (data.evt_type == "drawing"){
                 show = JSON.stringify(data);
                 var inputCell = document.getElementById("input");
-                inputCell.innerHTML = show + ', ' + inputCell.innerHTML;
+                inputCell.innerHTML = show + '<br/>' + inputCell.innerHTML;
             }else{
                 var inputCell = document.getElementById("input");
                 inputCell.innerHTML = '<div></div>';
