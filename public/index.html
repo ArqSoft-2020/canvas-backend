@@ -35,15 +35,7 @@
         source.onmessage = function (event) {
             var data = JSON.parse(event.data);
             if (data.evt_type == "drawing"){
-                var show = {
-                    coord_x: data.coord_x,
-                    coord_y: data.coord_y,
-                    color_r: data.color_r,
-                    color_g: data.color_g,
-                    color_b: data.color_b,
-                }
-
-                show = JSON.stringify(show);
+                show = JSON.stringify(data);
                 var inputCell = document.getElementById("input");
                 inputCell.innerHTML = show + ', ' + inputCell.innerHTML;
             }else{
