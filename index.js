@@ -1,5 +1,9 @@
 'use strict';
 
+// docker system prune
+// docker-compose build --no-cache
+// docker-compose up
+
 const express = require('express'); 
 const bodyParser = require('body-parser');
 const http = require('http');
@@ -18,12 +22,15 @@ app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 
 //Conection to DB
-mongoose.connect('mongodb://localhost:27017/canvasDB', { 
+mongoose.connect('mongodb://mongo:27017/canvasDB', { 
         useNewUrlParser: true,
         useUnifiedTopology: true
     }, (err, res) => {
-    if (err) console.log("Database connection error: " + err);
-    console.log("Database connection successful");
+    if (err){
+        console.log("Database connection error: " + err);
+    }else{
+        console.log("Database connection successful");
+    }
 });
 
 //configure sseMW.sseMiddleware as function to get a stab at incoming requests
@@ -100,6 +107,20 @@ app.post('/api/canvas/update', (req, res) => {
         });
     }
     
+});
+
+app.get('/api/canvas/historial/', (req, res) => {
+    Canvas.find({}, (err, drawingHistorials) => {
+        if (err) {
+            res.status(500).send({
+                message: 'Server error at finding drawing historials: ' + err
+            });
+        } else {
+            res.status(200).send({
+                drawingHistorials,
+            });
+        }
+    });
 });
 
 app.get('/api/canvas/historial/:id', (req, res) => {

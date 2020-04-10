@@ -1,0 +1,18 @@
+version: "3"
+services:
+       canvas-ms-container:
+           container_name: canvas-ms-container
+           image: canvas-ms
+           restart: always
+           build: .
+           ports:
+             - "3000:3000"
+           links:
+             - mongo
+       mongo:
+             container_name: mongo
+             image: mongo
+             volumes:
+               - ./data:/data/db
+             ports:
+               - '27018:27017'
