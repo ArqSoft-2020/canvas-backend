@@ -1,7 +1,7 @@
 {
-  "name": "canvas-backend",
+  "name": "canvas-ms",
   "version": "1.0.0",
-  "description": "Canvas back-end",
+  "description": "Canvas Micro service back-end",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
