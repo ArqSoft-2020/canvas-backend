@@ -13,6 +13,15 @@ const Canvas = require('./models/canvas');
 const PORT = process.env.PORT || 3000;
 const app = express();
 
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+}
+
+app.use(allowCrossDomain);  
+
 app.listen(PORT, () => {
     console.log('Server running, listening at ' + PORT);
 });
@@ -37,28 +46,32 @@ mongoose.connect('mongodb://mongo:27017/canvasDB', {
 //in this case by adding a Connection property to the request
 app.use(sseMW.sseMiddleware);
 
-// Realtime updates
-var sseClients = new sseMW.Topic();
+// Realtime updates groups of clients 
+var sseClients = {};
 
-app.get('/api/canvas/update', (req, res) => {
+app.get('/api/canvas/update/:id', (req, res) => {
+    if (sseClients[req.params.id] == undefined){
+        sseClients[req.params.id] = new sseMW.Topic();
+    }
+    console.log(req.params.id);
     var sseConnection = res.sseConnection;
     console.log("sseConnection specs= ");
     sseConnection.setup();
-    sseClients.add(sseConnection);
+    sseClients[req.params.id].add(sseConnection);
 });
 
 var lastChange;
-let updateSseClients = (data) => {
+let updateSseClients = (data, id) => {
     this.lastChange = data;
     const thisArg = this;
-    sseClients.forEach(function (sseConnection) {
+    sseClients[id].forEach(function (sseConnection) {
         console.log(thisArg);
-        console.log("send sse message global m " + JSON.stringify(thisArg.lastChange));
+        console.log("send sse message global: " + JSON.stringify(thisArg.lastChange));
         sseConnection.send(thisArg.lastChange);
     }, thisArg);
 };
 
-app.post('/api/canvas/update', (req, res) => {
+app.post('/api/canvas/update/:id', (req, res) => {
     let data = req.body;
 
     if (data.request_user_id == data.allowed_user_id){
@@ -70,9 +83,9 @@ app.post('/api/canvas/update', (req, res) => {
             color_b: data.color_b,
             evt_type: data.evt_type,
         };
-        updateSseClients(drawingdata);
+        updateSseClients(drawingdata, req.params.id);
 
-        Canvas.findById(data.drawing_historial_id, (err, drawingHistorial) => {
+        Canvas.findById(req.params.id, (err, drawingHistorial) => {
             if (err) {
                 res.status(500).send({
                     message: 'Server error at finding drawing historial: ' + err
