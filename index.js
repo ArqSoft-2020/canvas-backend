@@ -53,44 +53,53 @@ let updateSseClients = (data) => {
 
 app.post('/api/canvas/update', (req, res) => {
     let data = req.body;
-    updateSseClients(data);
 
-    Canvas.findById(data.drawing_historial_id, (err, drawingHistorial) => {
-        if (err) {
-            res.status(500).send({
-                message: 'Server error at finding drawing historial: ' + err
-            });
-        } else if (!drawingHistorial) {
-            res.status(404).send({
-                message: 'Canvas doesnt exist'
-            });
-        } else {
-            if (data.evt_type == "drawing") {
-                let new_entry = {
-                    coord_x: data.coord_x,
-                    coord_y: data.coord_y,
-                    color_r: data.color_r,
-                    color_g: data.color_g,
-                    color_b: data.color_b,
-                };
-                drawingHistorial.drawingHistorial.push(new_entry);
-            }else{
-                drawingHistorial.drawingHistorial = [];
-            }
-            drawingHistorial.save((err, drawingHistorialUpdated) => {
-                if (err) {
-                    res.status(500).send({
-                        message: 'Canvas drawing historial update failed: ' + err
-                    });
+    if (data.request_user_id == data.allowed_user_id){
+        let drawingdata = {
+            coord_x: data.coord_x,
+            coord_y: data.coord_y,
+            color_r: data.color_r,
+            color_g: data.color_g,
+            color_b: data.color_b,
+            evt_type: data.evt_type,
+        };
+        updateSseClients(drawingdata);
+
+        Canvas.findById(data.drawing_historial_id, (err, drawingHistorial) => {
+            if (err) {
+                res.status(500).send({
+                    message: 'Server error at finding drawing historial: ' + err
+                });
+            } else if (!drawingHistorial) {
+                res.status(404).send({
+                    message: 'Canvas doesnt exist'
+                });
+            } else {
+                if (data.evt_type == "drawing") {
+                    drawingHistorial.drawingHistorial.push(drawingdata);
                 } else {
-                    res.status(200).send({
-                        message: 'Drawing historial successfuly updated',
-                        canvas: drawingHistorialUpdated,
-                    });
+                    drawingHistorial.drawingHistorial = [];
                 }
-            });
-        }
-    });
+                drawingHistorial.save((err, drawingHistorialUpdated) => {
+                    if (err) {
+                        res.status(500).send({
+                            message: 'Canvas drawing historial update failed: ' + err
+                        });
+                    } else {
+                        res.status(200).send({
+                            message: 'Drawing historial successfuly updated',
+                            canvas: drawingHistorialUpdated,
+                        });
+                    }
+                });
+            }
+        });
+    }else{
+        res.status(403).send({
+            message: 'User has no permissions'
+        });
+    }
+    
 });
 
 app.get('/api/canvas/historial/:id', (req, res) => {
