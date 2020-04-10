@@ -13,6 +13,15 @@ const Canvas = require('./models/canvas');
 const PORT = process.env.PORT || 3000;
 const app = express();
 
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+}
+
+app.use(allowCrossDomain);  
+
 app.listen(PORT, () => {
     console.log('Server running, listening at ' + PORT);
 });
@@ -22,7 +31,7 @@ app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 
 //Conection to DB
-mongoose.connect('mongodb://localhost:27017/canvasDB', { 
+mongoose.connect('mongodb://mongo:27017/canvasDB', { 
         useNewUrlParser: true,
         useUnifiedTopology: true
     }, (err, res) => {
@@ -37,9 +46,7 @@ mongoose.connect('mongodb://localhost:27017/canvasDB', {
 //in this case by adding a Connection property to the request
 app.use(sseMW.sseMiddleware);
 
-// Realtime updates
-//var sseClients = new sseMW.Topic();
-
+// Realtime updates groups of clients 
 var sseClients = {};
 
 app.get('/api/canvas/update/:id', (req, res) => {
