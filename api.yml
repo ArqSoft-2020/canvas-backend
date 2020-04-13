@@ -27,6 +27,9 @@ paths:
           description: The id of the canvas wich the client wants to connect
           required: true
           type: string
+      responses:
+        '200':
+          description: Client connected
 
     post:
       summary: Allow to the user that has permissions to draw in the canvas modify it
