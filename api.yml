@@ -1,0 +1,218 @@
+#Test with: http://editor.swagger.io/
+
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Microservice for Drawing canvas
+  description: JavaScript (Node.js) + MongoDB
+  license:
+    name: Software Architecture Project, 2020-I
+host: localhost:3000
+basePath: /api/canvas
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+  
+paths:
+  /update/{id}:
+    get:
+      summary: Allow clients to connect to the canvas users group by the canvas id
+      operationId: connectToCanvasById
+      parameters:
+        - name: id
+          in: path
+          description: The id of the canvas wich the client wants to connect
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Client connected to canvas group
+
+    post:
+      summary: Allow to the user that has permissions to draw in the canvas modify it
+      operationId: updateDrawingCanvas
+      parameters:
+        - name: id
+          in: path
+          description: The id of the canvas wich the client wants to modify
+          required: true
+          type: string
+        - name: canvas_update_params
+          in: body
+          required: true
+          description: Details of the canvas update and request and allowed user id to verify that only the allowed user makes changes on the canvas
+          schema:
+            $ref: '#/definitions/UpdateParams'
+      responses:
+        '200':
+          description: Drawing historial successfuly updated
+          schema:
+            $ref: '#/definitions/Canvas'
+        '403':
+          description: User has no permissions (request_user_id != allowed_user_id)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '404':
+          description: Canvas doesnt exist
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Canvas drawing historial update failed
+          schema:
+            $ref: '#/definitions/ErrorModel'
+          
+  /historial:
+  
+    get:
+      summary: Search all canvas in the database 
+      operationId: searchAllCanvas
+      responses:
+        '200':
+          description: List of all canvas in the database
+          schema:
+            $ref: '#/definitions/Canvas'
+        '500':
+          description: Server error at finding drawing historials
+          schema:
+            $ref: '#/definitions/ErrorModel'
+            
+    post:
+      summary: Create new canvas
+      operationId: createCanvas
+      responses:
+        '200':
+          description: Drawing historial successfuly created
+          schema:
+            $ref: '#/definitions/Canvas'
+        '500':
+          description: Canvas drawing historial creation failed
+          schema:
+            $ref: '#/definitions/ErrorModel'
+
+  /historial/{id}:
+  
+    get:
+      summary: Search canvas by given Id 
+      operationId: searchCanvasById
+      parameters:
+        - name: id
+          in: path
+          description: The id of the canvas to be searched
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Canvas with the given id
+          schema:
+            $ref: '#/definitions/Canvas'
+        '404':
+          description: Canvas doesnt exist
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error at finding drawing historial
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  
+    delete:
+      summary: Deletes a canvas with the given id
+      operationId: deleteCanvas
+      parameters:
+        - name: id
+          in: path
+          description: The id of the canvas to be deleted
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Drawing historial deleted
+        '404':
+          description: Canvas doesnt exist
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Server error at deleting drawing historial
+          schema:
+            $ref: '#/definitions/ErrorModel'
+
+definitions:
+  Canvas:
+    type: object
+    required:
+      - id
+      - drawingHistorial
+    properties:
+      id:
+        type: integer
+      drawingHistorial:
+        type: array
+        items:
+          $ref: '#/definitions/drawingHistorialItem'
+  
+  UpdateParams:
+    type: object
+    required:
+      - evt_type 
+      - request_user_id
+      - allowed_user_id
+      - coord_x
+      - coord_y
+      - color_r
+      - color_g
+      - color_b
+    properties:
+      evt_type:
+        type: string
+      request_user_id:
+        type: integer
+      allowed_user_id:
+        type: integer
+      coord_x:
+        type: integer
+      coord_y:
+        type: integer
+      color_r:
+        type: integer
+      color_g:
+        type: integer
+      color_b:
+        type: integer
+
+  drawingHistorialItem:
+    type: object
+    required:
+      - coord_x
+      - coord_y
+      - color_r
+      - color_g
+      - color_b
+      - evt_type
+    properties:
+      coord_x:
+        type: integer
+      coord_y:
+        type: integer
+      color_r:
+        type: integer
+      color_g:
+        type: integer
+      color_b:
+        type: integer
+      evt_type:
+        type: string
+
+  ErrorModel:
+    type: object
+    required:
+      - message
+      - code
+    properties:
+      message:
+        type: string
+      code:
+        type: number
+      description:
+        type: object

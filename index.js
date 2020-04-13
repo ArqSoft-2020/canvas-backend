@@ -18,7 +18,7 @@ var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
-}
+};
 
 app.use(allowCrossDomain);  
 
@@ -53,11 +53,13 @@ app.get('/api/canvas/update/:id', (req, res) => {
     if (sseClients[req.params.id] == undefined){
         sseClients[req.params.id] = new sseMW.Topic();
     }
-    console.log(req.params.id);
     var sseConnection = res.sseConnection;
-    console.log("sseConnection specs= ");
+    console.log(req.params.id  + " sseConnection specs = ");
     sseConnection.setup();
     sseClients[req.params.id].add(sseConnection);
+    res.status(200).send({
+        message: 'Client connected to canvas group'
+    });
 });
 
 var lastChange;
