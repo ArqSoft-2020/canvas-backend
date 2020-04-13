@@ -57,9 +57,6 @@ app.get('/api/canvas/update/:id', (req, res) => {
     console.log(req.params.id  + " sseConnection specs = ");
     sseConnection.setup();
     sseClients[req.params.id].add(sseConnection);
-    res.status(200).send({
-        message: 'Client connected to canvas group'
-    });
 });
 
 var lastChange;
