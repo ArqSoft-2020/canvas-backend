@@ -65,11 +65,13 @@ var lastChange;
 let updateSseClients = (data, id) => {
     this.lastChange = data;
     const thisArg = this;
-    sseClients[id].forEach(function (sseConnection) {
-        console.log(thisArg);
-        console.log("send sse message global: " + JSON.stringify(thisArg.lastChange));
-        sseConnection.send(thisArg.lastChange);
-    }, thisArg);
+    if(sseClients[id] != undefined){
+        sseClients[id].forEach(function (sseConnection) {
+            console.log(thisArg);
+            console.log("send sse message global: " + JSON.stringify(thisArg.lastChange));
+            sseConnection.send(thisArg.lastChange);
+        }, thisArg);
+    }
 };
 
 app.post('/api/canvas/update/:id', (req, res) => {
