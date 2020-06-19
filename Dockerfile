@@ -18,5 +18,5 @@ RUN npm install
 #copying the source code of Application into the container dir
 COPY . /usr/src/app
 
-EXPOSE 3000
+EXPOSE 3001
 CMD [ "node", "index.js" ]

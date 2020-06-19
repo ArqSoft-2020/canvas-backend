@@ -3,8 +3,7 @@
 <head>
     <title>Canvas MS</title>
     <script>
-        var baseURL = "http://ec2-54-172-166-70.compute-1.amazonaws.com:3000/";
-        var canvasId = "5e9a0fff552cb2efd99f67f8";
+        var baseURL = "http://ec2-54-172-166-70.compute-1.amazonaws.com:3001/";
         //Class created to support the get request to update the drawing historial
         var HttpClient = function() {
             this.get = function(aUrl, aCallback) {
@@ -19,6 +18,12 @@
             }
         }
 
+        var canvasId = "";
+        function myFunction() {
+            canvasId = document.getElementById("myText").value;
+        }
+
+        console.log(canvasId);
         //Update with historial info
         
         var client = new HttpClient();
@@ -51,6 +56,9 @@
 
 <body>
     <h1>Canvas MicroService</h1>
+    <br />
+    <input type="text" id="canvasID" value="Canvas ID">
+    <button onclick="myFunction()">Submit</button>
     <br />
     <div id="input">
     </div>

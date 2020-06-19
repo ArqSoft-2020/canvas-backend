@@ -12,7 +12,7 @@ const http = require('http');
 const sseMW = require('./sse');
 const mongoose = require('mongoose');
 const Canvas = require('./models/canvas');
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const app = express();
 
 var allowCrossDomain = function(req, res, next) {
