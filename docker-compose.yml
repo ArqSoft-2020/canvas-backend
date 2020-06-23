@@ -4,15 +4,9 @@ services:
            container_name: canvas-ms-container
            image: canvas-ms
            restart: always
-           build: .
+           build:
+            context: .
+            dockerfile: Dockerfile
            ports:
              - "3001:3001"
-           links:
-             - mongo
-       mongo:
-             container_name: mongo
-             image: mongo
-             volumes:
-               - ./data:/data/db
-             ports:
-               - '27018:27017'
+

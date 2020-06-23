@@ -3,52 +3,52 @@
 <head>
     <title>Canvas MS</title>
     <script>
-        var baseURL = "http://ec2-54-172-166-70.compute-1.amazonaws.com:3001/";
-        //Class created to support the get request to update the drawing historial
-        var HttpClient = function() {
-            this.get = function(aUrl, aCallback) {
-                var anHttpRequest = new XMLHttpRequest();
-                anHttpRequest.onreadystatechange = function() {
-                if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-                    aCallback(anHttpRequest.responseText);
-                }
-
-                anHttpRequest.open( "GET", aUrl, true );
-                anHttpRequest.send( null );
-            }
-        }
-
+        var baseURL = "http://ec2-3-217-93-77.compute-1.amazonaws.com:3001/";
         var canvasId = "";
         function myFunction() {
-            canvasId = document.getElementById("myText").value;
-        }
+            canvasId = document.getElementById("canvasID").value;
+            console.log(canvasId);
 
-        console.log(canvasId);
-        //Update with historial info
-        
-        var client = new HttpClient();
-        client.get(baseURL + 'api/canvas/historial/' + canvasId, function(response) {
-            response = JSON.parse(response)
-            response.drawingHistorial.drawingHistorial.forEach(element => {
-                var show = JSON.stringify(element);
-                var inputCell = document.getElementById("input");
-                inputCell.innerHTML = show + '<br/>' + inputCell.innerHTML;
-            });
-        });
+            //Class created to support the get request to update the drawing historial
+            var HttpClient = function() {
+                this.get = function(aUrl, aCallback) {
+                    var anHttpRequest = new XMLHttpRequest();
+                    anHttpRequest.onreadystatechange = function() {
+                    if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
+                        aCallback(anHttpRequest.responseText);
+                    }
 
-        var source = new EventSource(baseURL + "api/canvas/update/" + canvasId);
-        source.onmessage = function (event) {
-            var data = JSON.parse(event.data);
-            if (data.evt_type == "drawing"){
-                show = JSON.stringify(data);
-                var inputCell = document.getElementById("input");
-                inputCell.innerHTML = show + '<br/>' + inputCell.innerHTML;
-            }else{
-                var inputCell = document.getElementById("input");
-                inputCell.innerHTML = '<div></div>';
+                    anHttpRequest.open( "GET", aUrl, true );
+                    anHttpRequest.send( null );
+                }
             }
-            
-        };//onMessage
+
+            //Update with historial info
+        
+            var client = new HttpClient();
+            client.get(baseURL + 'api/canvas/historial/' + canvasId, function(response) {
+                response = JSON.parse(response)
+                response.drawingHistorial.drawingHistorial.forEach(element => {
+                    var show = JSON.stringify(element);
+                    var inputCell = document.getElementById("input");
+                    inputCell.innerHTML = show + '<br/>' + inputCell.innerHTML;
+                });
+            });
+
+            var source = new EventSource(baseURL + "api/canvas/update/" + canvasId);
+            source.onmessage = function (event) {
+                var data = JSON.parse(event.data);
+                if (data.evt_type == "drawing"){
+                    show = JSON.stringify(data);
+                    var inputCell = document.getElementById("input");
+                    inputCell.innerHTML = show + '<br/>' + inputCell.innerHTML;
+                }else{
+                    var inputCell = document.getElementById("input");
+                    inputCell.innerHTML = '<div></div>';
+                }
+                
+            };//onMessage
+        }
 
     </script>
 
@@ -57,8 +57,10 @@
 <body>
     <h1>Canvas MicroService</h1>
     <br />
-    <input type="text" id="canvasID" value="Canvas ID">
+    <p>Canvas ID: </p>
+    <input type="text" id="canvasID" value="">
     <button onclick="myFunction()">Submit</button>
+    <br />
     <br />
     <div id="input">
     </div>
