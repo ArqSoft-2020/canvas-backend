@@ -34,13 +34,13 @@ app.use(express.static(__dirname + '/public'));
 
 //Conection to DB
 var connectWithRetry = function() {
-    mongoose.connect('mongodb://sapcanvasdb:27017/canvasDB', { 
+    mongoose.connect('mongodb://sapcanvasdb1:27017,sapcanvasdb2:27018/CanvasDB', { 
         useNewUrlParser: true,
         useUnifiedTopology: true,
     }, (err, res) => {
         if (err){
             console.log("Database connection error: " + err);
-            console.log("Attempting to reconnect");
+            console.log("Attempting to reconnect 1");
             setTimeout(connectWithRetry, 6000);
         }else{
             console.log("Database connection successful");
@@ -57,6 +57,7 @@ app.use(sseMW.sseMiddleware);
 var sseClients = {};
 
 app.get('/api/canvas/update/:id', (req, res) => {
+    console.log("Client connect request");
     if (sseClients[req.params.id] == undefined){
         sseClients[req.params.id] = new sseMW.Topic();
     }
